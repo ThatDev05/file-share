@@ -1,17 +1,20 @@
 const router = require('express').Router();
-const File = require('../models/file');
+const File = require('../model/file');
+
 
 router.get('/:uuid', async (req, res) => {
-   // Extract link and get file from storage send download stream 
-   const file = await File.findOne({ uuid: req.params.uuid });
-   // Link expired
-   if(!file) {
-        return res.render('download', { error: 'Link has been expired.'});
-   } 
-   const response = await file.save();
-   const filePath = `${__dirname}/../${file.path}`;
-   res.download(filePath);
-});
+    const file = await File.findOne({ uuid: req.params.uuid });
+    if (!file) {
+        return res.status(404).render('download', { error: 'Link has expired' });
+    }
 
+    const filePath = `${__dirname}/../${file.path}`;
+    res.download(filePath, file.filename, (err) => {
+        if (err) {
+            return res.status(500).render('download', { error: 'Could not download file.' });
+        }
+    });
+    
+})
 
 module.exports = router;

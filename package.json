@@ -1,23 +1,33 @@
 {
-  "name": "file-sharing",
+  "name": "file-shareing-backend",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "license": "MIT",
   "scripts": {
-    "dev": "nodemon server",
-    "serve": "node server"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThatDev05/file-share-BACKEND.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ThatDev05/file-share-BACKEND/issues"
+  },
+  "homepage": "https://github.com/ThatDev05/file-share-BACKEND#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "ejs": "^3.1.5",
-    "express": "^4.17.1",
-    "mongoose": "^5.10.0",
-    "multer": "^1.4.2",
-    "nodemailer": "^6.4.11",
-    "uuid": "^8.3.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10",
+    "nodemon": "^3.1.10",
+    "uuid": "^13.0.0"
   }
 }
