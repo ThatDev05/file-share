@@ -1,8 +1,9 @@
+
 :root {
-    --main-bg-color: #edf5fe;
-    --light-blue: #03a9f4;
-    --dark-blue: #028bca;
-  }
+  --main-bg-color: #1E242B;
+  --light-blue: #03a9f4;
+  --border-color: #122532;
+}
 
   body {
     font-family: system-ui;
@@ -12,7 +13,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #333;
+    color: white;
   }
 
   .logo {
@@ -22,7 +23,7 @@
     width: 150px;
   }
 section.download {
-    background: #fff;
+    background: #121212;
     width: 430px;
     max-width: 90%;
     border-radius: 25px;

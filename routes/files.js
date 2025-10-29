@@ -50,29 +50,38 @@ router.post('/send', async (req, res) => {
     if (!uuid || !emailTo || !emailFrom) {
         return res.status(422).send({ error: 'All fields are required.' });
     }
-    const file = await File.findOne({ uuid: uuid });
-    if (file.sender) {
-        return res.status(422).send({ error: 'Email already sent once.' });
-    }
-    file.sender = emailFrom;
-    file.receiver = emailTo;
-    const response = await file.save();
+    try {
+        const file = await File.findOne({ uuid: uuid });
+        if (!file) return res.status(404).send({ error: 'File not found.' });
 
-    // send email
-    const sendEmail = require('../services/emailService');
-    sendEmail({
-        from: emailFrom,
-        to: emailTo,
-        subject: 'INShare File Sharing',
-        text: `${emailFrom} shared a file with you.`,
-        html: require('../services/emailTemplate')({
-            emailFrom: emailFrom,
-            downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}`,
-            size: (file.size / 1000).toFixed(2) + ' KB',
-            expires: '48 hours'
-        })
-    });
-    return res.send({ success: true });
+        if (file.sender) {
+            return res.status(422).send({ error: 'Email already sent once.' });
+        }
+
+        file.sender = emailFrom;
+        file.receiver = emailTo;
+        const response = await file.save();
+
+        // send email (await and catch errors)
+        const sendEmail = require('../services/emailService');
+        await sendEmail({
+            from: emailFrom,
+            to: emailTo,
+            subject: 'INShare File Sharing',
+            text: `${emailFrom} shared a file with you.`,
+            html: require('../services/emailTemplate')({
+                emailFrom: emailFrom,
+                downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}`,
+                size: (file.size / 1000).toFixed(2) + ' KB',
+                expires: '24 hours'
+            })
+        });
+
+        return res.send({ success: true });
+    } catch (err) {
+        console.error('Error in /api/files/send:', err);
+        return res.status(500).send({ error: 'Internal server error' });
+    }
 
 })
 

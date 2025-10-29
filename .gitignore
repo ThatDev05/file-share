@@ -1,4 +1,28 @@
+# Node modules
+node_modules/
+
+# Environment files
 .env
-uplodes/*
-!uplodes/.gitkeep
-node-modules
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build / runtime
+dist/
+build/
+
+# Optional: local IDE settings
+.vscode/
+.idea/
+
+
+# uploads
+uploads/*
+!uploads/.gitkeep
