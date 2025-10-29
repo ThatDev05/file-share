@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/ThatDev05/file-share-BACKEND#readme",
   "dependencies": {
+    "@vercel/blob": "^0.24.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",

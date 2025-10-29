@@ -1,10 +1,12 @@
 const router = require('express').Router();
 const multer = require('multer');
+const os = require('os');
 const File = require('../model/file');
 const path = require('path');
 
+// Use system temp directory in serverless environments (writable).
 const upload = multer({
-    dest: 'uploads/',
+    dest: os.tmpdir(),
     limits: {
         fileSize: 1000000 * 100 // 100MB limit
     }

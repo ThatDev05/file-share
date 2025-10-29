@@ -21,7 +21,10 @@ const toast = document.querySelector(".toast");
 const uploadURL = "/api/files";
 const emailURL = "/api/files/send";
 
-const maxAllowedSize = 100 * 1024 * 1024; //100mb
+// Serverless functions on Vercel have a small body size limit. Use a lower
+// client-side limit in production on vercel.app to avoid 413 responses.
+const isVercel = typeof window !== 'undefined' && /vercel\.app$/i.test(window.location.hostname);
+const maxAllowedSize = isVercel ? (4 * 1024 * 1024) : (100 * 1024 * 1024);
 
 
 browseBtn.addEventListener("click", () => {
@@ -102,6 +105,7 @@ const uploadFile = () => {
 
   // upload file
   const xhr = new XMLHttpRequest();
+  xhr.responseType = 'text';
 
   // listen for upload progress
   xhr.upload.onprogress = function (event) {
@@ -122,7 +126,27 @@ const uploadFile = () => {
   // listen for response which will give the link
   xhr.onreadystatechange = function () {
     if (xhr.readyState == XMLHttpRequest.DONE) {
-      onFileUploadSuccess(xhr.responseText);
+      const contentType = xhr.getResponseHeader('content-type') || '';
+      const responseText = xhr.responseText || '';
+      if (xhr.status >= 400) {
+        // Show server-provided message when available
+        let message = `Upload failed (${xhr.status})`;
+        if (contentType.includes('application/json')) {
+          try {
+            const parsed = JSON.parse(responseText);
+            if (parsed && (parsed.error || parsed.message)) {
+              message = parsed.error || parsed.message;
+            }
+          } catch(_) {}
+        } else if (/Request Entity Too Large/i.test(responseText)) {
+          message = 'File too large for serverless upload. Try a smaller file.';
+        }
+        showToast(message);
+        fileInput.value = '';
+        progressContainer.style.display = 'none';
+        return;
+      }
+      onFileUploadSuccess(responseText, contentType);
     }
   };
 
@@ -130,21 +154,52 @@ const uploadFile = () => {
   xhr.send(formData);
 };
 
-const onFileUploadSuccess = (res) => {
-  fileInput.value = ""; // reset the input
-  status.innerText = "Uploaded";
+const onFileUploadSuccess = (res, contentType = '') => {
+  console.log('Upload response:', res);
+  
+  try {
+    fileInput.value = ""; // reset the input
+    status.innerText = "Uploaded";
 
-  // remove the disabled attribute from form btn & make text send
-  if (emailSendBtn) {
-    emailSendBtn.removeAttribute("disabled");
-    emailSendBtn.innerText = "Send";
+    // remove the disabled attribute from form btn & make text send
+    if (emailSendBtn) {
+      emailSendBtn.removeAttribute("disabled");
+      emailSendBtn.innerText = "Send";
+    }
+    progressContainer.style.display = "none"; // hide the box
+
+    const parsed = contentType.includes('application/json')
+      ? JSON.parse(res)
+      : (res && res.trim().startsWith('{') ? JSON.parse(res) : null);
+    if (!parsed) {
+      showToast('Unexpected response from server');
+      return;
+    }
+    console.log('Parsed response:', parsed);
+    
+    if (!parsed.file) {
+      console.error('No file URL in response');
+      showToast('Upload failed - no download link');
+      return;
+    }
+
+    const { file: url } = parsed;
+    console.log('File URL:', url);
+    
+    if (sharingContainer) {
+      sharingContainer.style.display = "block";
+      if (fileURL) {
+        fileURL.value = url;
+      } else {
+        console.error('fileURL element not found');
+      }
+    } else {
+      console.error('sharingContainer element not found');
+    }
+  } catch (err) {
+    console.error('Error processing upload response:', err);
+    showToast('Upload failed - ' + err.message);
   }
-  progressContainer.style.display = "none"; // hide the box
-
-  const { file: url } = JSON.parse(res);
-  console.log(url);
-  sharingContainer.style.display = "block";
-  fileURL.value = url;
 };
 
 emailForm.addEventListener("submit", (e) => {

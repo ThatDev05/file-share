@@ -6,9 +6,22 @@ const cors = require('cors');
 
 dotenv.config();
 
+// Log environment status (without exposing values)
+console.log('Environment Check:', {
+    MONGO_URL_SET: !!process.env.MONGO_CONNETION_URL,
+    APP_BASE_URL_SET: !!process.env.APP_BASE_URL,
+    SMTP_CONFIG_SET: !!(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER)
+});
+
 // Initialize MongoDB connection
 const connectDB = require('./config/db');
-connectDB().catch(console.error);
+connectDB().catch(err => {
+    console.error('Failed to connect to MongoDB:', err);
+    // In production, we might want to continue running even if DB fails
+    if (process.env.NODE_ENV === 'production') {
+        console.log('Continuing despite MongoDB connection failure');
+    }
+});
 
 // Middleware
 const publicPath = path.join(__dirname, 'public');
