@@ -26,3 +26,4 @@ build/
 # uploads
 uploads/*
 !uploads/.gitkeep
+.vercel

@@ -15,6 +15,9 @@
   "author": "",
   "license": "MIT",
   "type": "commonjs",
+  "engines": {
+    "node": "22.x"
+  },
   "bugs": {
     "url": "https://github.com/ThatDev05/file-share-BACKEND/issues"
   },
@@ -28,6 +31,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.10",
     "nodemon": "^3.1.10",
+    "serverless-http": "^3.2.0",
     "uuid": "^8.3.2"
   }
 }
