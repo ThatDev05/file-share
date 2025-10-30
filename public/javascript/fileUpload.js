@@ -178,8 +178,9 @@ const onFileUploadSuccess = (res, contentType = '') => {
     console.log('Parsed response:', parsed);
     
     if (!parsed.file) {
-      console.error('No file URL in response');
-      showToast('Upload failed - no download link');
+      const serverMessage = parsed.error || parsed.message;
+      console.error('No file URL in response', parsed);
+      showToast('Upload failed' + (serverMessage ? ' - ' + serverMessage : ' - no download link'));
       return;
     }
 
