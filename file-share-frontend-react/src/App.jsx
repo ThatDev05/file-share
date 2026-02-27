@@ -8,7 +8,7 @@ function App() {
     <Router>
       <div className="app-container">
         <a href="/">
-          <img src="https://send.creativeshi.com/logo.png" alt="Inshare logo" className="logo" />
+          <img src="/logo.png" alt="Inshare logo" className="logo" />
         </a>
         <Routes>
           <Route path="/" element={<Home />} />
