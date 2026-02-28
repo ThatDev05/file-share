@@ -6,6 +6,7 @@ const File = require('../model/file');
 const connectDB = require('../config/db');
 const { v4: uuid4 } = require('uuid');
 const mongoose = require('mongoose');
+const QRCode = require('qrcode');
 
 const { Readable } = require('stream');
 
