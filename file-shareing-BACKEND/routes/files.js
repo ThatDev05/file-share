@@ -189,7 +189,7 @@ router.get('/info/:uuid', async (req, res) => {
             uuid: file.uuid,
             fileName: file.filename,
             fileSize: file.size,
-            downloadLink: `${process.env.APP_BASE_URL}/files/download/${file.uuid}`
+            downloadLink: `${process.env.FRONTEND_URL}/download?uuid=${file.uuid}`
         });
     } catch (err) {
             return res.status(500).json({ error: 'Something went wrong' });
