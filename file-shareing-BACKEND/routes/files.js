@@ -9,13 +9,7 @@ const QRCode = require('qrcode');
 
 const os = require('os');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
-    filename: (req, file, cb) => {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
-        cb(null, uniqueName);
-    }
-});
+const storage = multer.memoryStorage();
 
 let upload = multer({ storage, limits: { fileSize: 1000000 * 200 } }).single('file');
 
@@ -55,48 +49,51 @@ router.post('/', (req, res) => {
         const uuid = uuid4();
         const pin = Math.floor(100000 + Math.random() * 900000).toString();
 
-        //store into db
-        const file = new File({
-            filename: req.file.filename,
-            uuid: uuid,
-            path: req.file.path,
-            size: req.file.size,
-            pin: pin
-        });
+        try {
+            // Upload the file to Vercel Blob storage
+            const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
+            const blob = await put(`uploads/${uniqueName}`, req.file.buffer, {
+                access: 'public',
+                contentType: req.file.mimetype
+            });
+            console.log('File successfully uploaded to Vercel Blob:', blob.url);
 
-      //response --> link
-            try {
-                console.log('Attempting to save file to DB...');
-                const response = await file.save();
-                console.log('File saved successfully:', {
-                    uuid: response.uuid,
-                    id: response._id,
-                    filename: response.filename
-                });
-                
-                const fileUrl = `${process.env.APP_BASE_URL}/files/${response.uuid}`;
-                const qrCodeDataUrl = await QRCode.toDataURL(fileUrl);
-                console.log('Generated URL:', fileUrl);
-                console.log('APP_BASE_URL:', process.env.APP_BASE_URL);
-                
-                return res.json({ 
-                    file: fileUrl,
-                    uuid: response.uuid, // Include UUID in response for email step
-                    pin: response.pin,
-                    qrCode: qrCodeDataUrl
-                });
-            } catch (dbError) {
-                console.error('Database save error:', {
-                    message: dbError.message,
-                    code: dbError.code,
-                    name: dbError.name
-                });
-                return res.status(500).json({ 
-                    error: 'Failed to save file information',
-                    details: dbError.message
-                });
-            }
-       
+            //store into db
+            const file = new File({
+                filename: req.file.originalname, // use originalName since memoryStorage doesn't provide filename
+                uuid: uuid,
+                path: blob.url, // store blob URL as path
+                url: blob.url,  // store blob URL explicitly
+                size: req.file.size,
+                pin: pin
+            });
+
+            console.log('Attempting to save file to DB...');
+            const response = await file.save();
+            console.log('File saved successfully:', {
+                uuid: response.uuid,
+                id: response._id,
+                filename: response.filename
+            });
+            
+            const fileUrl = `${process.env.APP_BASE_URL}/files/${response.uuid}`;
+            const qrCodeDataUrl = await QRCode.toDataURL(fileUrl);
+            console.log('Generated URL:', fileUrl);
+            console.log('APP_BASE_URL:', process.env.APP_BASE_URL);
+            
+            return res.json({ 
+                file: fileUrl,
+                uuid: response.uuid, // Include UUID in response for email step
+                pin: response.pin,
+                qrCode: qrCodeDataUrl
+            });
+        } catch (error) {
+            console.error('Error during Vercel Blob upload or DB save:', error);
+            return res.status(500).json({ 
+                error: 'Failed to process file upload',
+                details: error.message
+            });
+        }
     });
 });
 
