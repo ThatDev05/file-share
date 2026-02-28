@@ -13,12 +13,12 @@ export default function UploadForm({ onUploadSuccess }) {
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
-  const maxAllowedSize = 4 * 1024 * 1024; // 4MB for Vercel demo
+  const maxAllowedSize = 20 * 1024 * 1024; // 20MB limit
 
   const handleFile = async (file) => {
     if (!file) return;
     if (file.size > maxAllowedSize) {
-      setError('Max file size is 4MB');
+      setError('Max file size is 20MB');
       return;
     }
     
