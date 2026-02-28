@@ -50,6 +50,13 @@ router.post('/', (req, res) => {
         const pin = Math.floor(100000 + Math.random() * 900000).toString();
 
         try {
+            console.log('Starting Vercel Blob upload for:', req.file.originalname, 'Size:', req.file.size);
+            
+            if (!process.env.BLOB_READ_WRITE_TOKEN) {
+                console.error('CRITICAL: BLOB_READ_WRITE_TOKEN is not set in the environment variables!');
+                throw new Error('Server configuration error: Vercel Blob token is missing');
+            }
+
             // Upload the file to Vercel Blob storage
             const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
             const blob = await put(`uploads/${uniqueName}`, req.file.buffer, {
@@ -88,10 +95,15 @@ router.post('/', (req, res) => {
                 qrCode: qrCodeDataUrl
             });
         } catch (error) {
-            console.error('Error during Vercel Blob upload or DB save:', error);
+            console.error('Error during Vercel Blob upload or DB save:', {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            });
             return res.status(500).json({ 
                 error: 'Failed to process file upload',
-                details: error.message
+                details: error.message,
+                name: error.name
             });
         }
     });
