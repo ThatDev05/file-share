@@ -60,6 +60,23 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
 
+// Cron endpoint for GridFS cleanup
+const cronRouter = require('./routes/cron');
+app.use('/api/cron', cronRouter);
+
+const cron = require('node-cron');
+// Run automatically at 3:00 AM every day locally (Vercel will ping the endpoint instead)
+cron.schedule('0 3 * * *', async () => {
+    console.log('Running local cron: Deleting files older than 24 hours');
+    try {
+        const result = await fetch(`http://localhost:${process.env.PORT || 3000}/api/cron/cleanup`);
+        const json = await result.json();
+        console.log('Local Cleanup Result:', json);
+    } catch(err) {
+        console.log('Local Cleanup Error:', err);
+    }
+});
+
 
 
 
