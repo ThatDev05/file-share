@@ -6,13 +6,9 @@ const fileSchema = new Schema({
         type: String,
         required: true
     },
-    path: {
-        type: String,
+    gridFsId: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true
-    },
-    url: {
-        type: String,
-        required: false
     },
     size: {
         type: Number,

@@ -1,17 +1,25 @@
 const router = require('express').Router();
 const multer = require('multer');
-const os = require('os');
-const File = require('../model/file');
-const path = require('path');
-const { put } = require('@vercel/blob');
+const mongoose = require('mongoose');
+const { GridFsStorage } = require('multer-gridfs-storage');
 
-// Use memory storage in serverless environments to avoid disk writes
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-        fileSize: 1000000 * 100 // 100MB limit
+// Configure GridFS Storage
+const storage = new GridFsStorage({
+    url: process.env.MONGO_CONNETION_URL,
+    options: { useNewUrlParser: true, useUnifiedTopology: true },
+    file: (req, file) => {
+        return new Promise((resolve, reject) => {
+            const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
+            const fileInfo = {
+                filename: filename,
+                bucketName: 'uploads' 
+            };
+            resolve(fileInfo);
+        });
     }
 });
+
+let upload = multer({ storage, limits: { fileSize: 1000000 * 200 } });
 
 router.post('/fileupload', upload.single('file'), async (req, res) => {
     try {
@@ -19,21 +27,13 @@ router.post('/fileupload', upload.single('file'), async (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        // Upload to Vercel Blob
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
-        const blob = await put(`fileupload/${uniqueName}`, req.file.buffer, {
-            access: 'public',
-            contentType: req.file.mimetype
-        });
-
-        // Create file document
+        // Create file metadata document
         const file = new File({
             filename: req.file.originalname,
-            path: blob.url,
-            url: blob.url,
+            gridFsId: req.file.id, // ID from GridFS
             size: req.file.size,
             originalName: req.file.originalname,
-            uuid: Math.random().toString(36).substring(2, 15), // add basic uuid just in case since required
+            uuid: Math.random().toString(36).substring(2, 15), // basic uuid requirement
             pin: Math.floor(100000 + Math.random() * 900000).toString()
         });
 
