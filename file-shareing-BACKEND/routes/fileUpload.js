@@ -1,24 +1,11 @@
 const router = require('express').Router();
 const multer = require('multer');
 const mongoose = require('mongoose');
-const { GridFsStorage } = require('multer-gridfs-storage');
 
-// Configure GridFS Storage
-const storage = new GridFsStorage({
-    url: process.env.MONGO_CONNETION_URL,
-    options: { useNewUrlParser: true, useUnifiedTopology: true },
-    file: (req, file) => {
-        return new Promise((resolve, reject) => {
-            const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
-            const fileInfo = {
-                filename: filename,
-                bucketName: 'uploads' 
-            };
-            resolve(fileInfo);
-        });
-    }
-});
+const { Readable } = require('stream');
 
+// Use simple memory storage. We will stream this to GridFS manually.
+const storage = multer.memoryStorage();
 let upload = multer({ storage, limits: { fileSize: 1000000 * 200 } });
 
 router.post('/fileupload', upload.single('file'), async (req, res) => {
@@ -27,10 +14,34 @@ router.post('/fileupload', upload.single('file'), async (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
+        // 1. Initialize GridFS Bucket
+        const db = mongoose.connection.db;
+        const bucket = new mongoose.mongo.GridFSBucket(db, {
+            bucketName: 'uploads'
+        });
+
+        // 2. Create the upload stream
+        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
+        const uploadStream = bucket.openUploadStream(uniqueName, {
+            contentType: req.file.mimetype,
+            metadata: { originalName: req.file.originalname }
+        });
+
+        // 3. Convert buffer to readable stream and pipe it to GridFS
+        const readableFileStream = new Readable();
+        readableFileStream.push(req.file.buffer);
+        readableFileStream.push(null); // End of stream
+
+        await new Promise((resolve, reject) => {
+            readableFileStream.pipe(uploadStream)
+                .on('error', reject)
+                .on('finish', resolve);
+        });
+
         // Create file metadata document
         const file = new File({
             filename: req.file.originalname,
-            gridFsId: req.file.id, // ID from GridFS
+            gridFsId: uploadStream.id, // ID from GridFS
             size: req.file.size,
             originalName: req.file.originalname,
             uuid: Math.random().toString(36).substring(2, 15), // basic uuid requirement
