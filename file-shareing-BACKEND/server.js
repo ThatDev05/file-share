@@ -10,6 +10,7 @@ dotenv.config();
 console.log('Environment Check:', {
     MONGO_URL_SET: !!process.env.MONGO_CONNETION_URL,
     APP_BASE_URL_SET: !!process.env.APP_BASE_URL,
+    ALLOWED_CLINTS_SET: !!process.env.ALLOWED_CLINTS,
     SMTP_CONFIG_SET: !!(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER)
 });
 
@@ -27,11 +28,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 const corsOptions = {
-    origin: process.env.ALLOWED_CLINTS ? process.env.ALLOWED_CLINTS.split(',') : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5500', 'http://127.0.0.1:5500', 'http://127.0.0.1:8080', 'http://localhost:8080', 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: process.env.ALLOWED_CLINTS ? process.env.ALLOWED_CLINTS.split(',') : '*', // Allow all by default if env is not set
     optionsSuccessStatus: 200
 }
 
+console.log('CORS Settings:', { origin: corsOptions.origin });
+
 app.use(cors(corsOptions));
+
+// Request logger for debugging in serverless
+app.use((req, res, next) => {
+    console.log(`[REQ] ${req.method} ${req.url}`);
+    next();
+});
 
 
 // Routes
