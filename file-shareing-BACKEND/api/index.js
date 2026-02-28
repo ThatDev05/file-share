@@ -9,7 +9,7 @@ module.exports = (req, res) => {
 };
 
 // Disable Vercel's default body parser to allow multer to process the multipart/form-data stream natively
-export const config = {
+module.exports.config = {
     api: {
         bodyParser: false,
     },
