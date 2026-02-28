@@ -2,6 +2,8 @@ const router = require('express').Router();
 const multer = require('multer');
 const mongoose = require('mongoose');
 const connectDB = require('../config/db');
+const path = require('path');
+const File = require('../model/file');
 
 const { Readable } = require('stream');
 
@@ -55,7 +57,7 @@ router.post('/fileupload', upload.single('file'), async (req, res) => {
         // Save to database
         const response = await file.save();
         return res.json({ 
-            file: `${process.env.APP_BASE_URL}/files/${response._id}`
+            file: `${process.env.APP_BASE_URL}/download?uuid=${response.uuid}`
         });
     } catch (err) {
         console.error('Error in file upload:', err);

@@ -99,7 +99,7 @@ router.post('/', (req, res) => {
                 filename: response.filename
             });
             
-            const fileUrl = `${process.env.APP_BASE_URL}/files/${response.uuid}`;
+            const fileUrl = `${process.env.APP_BASE_URL}/download?uuid=${response.uuid}`;
             const qrCodeDataUrl = await QRCode.toDataURL(fileUrl);
             console.log('Generated URL:', fileUrl);
             
@@ -153,7 +153,7 @@ router.post('/send', async (req, res) => {
             text: `${emailFrom} shared a file with you.`,
             html: require('../services/emailTemplate')({
                 emailFrom: emailFrom,
-                downloadLink: `${process.env.FRONTEND_URL}/download?uuid=${file.uuid}`,
+                downloadLink: `${process.env.APP_BASE_URL}/download?uuid=${file.uuid}`,
                 size: (file.size / 1000).toFixed(2) + ' KB',
                 expires: '24 hours'
             })
@@ -189,7 +189,7 @@ router.get('/info/:uuid', async (req, res) => {
             uuid: file.uuid,
             fileName: file.filename,
             fileSize: file.size,
-            downloadLink: `${process.env.FRONTEND_URL}/download?uuid=${file.uuid}`
+            downloadLink: `${process.env.APP_BASE_URL}/download?uuid=${file.uuid}`
         });
     } catch (err) {
             return res.status(500).json({ error: 'Something went wrong' });
