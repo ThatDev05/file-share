@@ -11,11 +11,11 @@ router.get('/:uuid', async (req, res) => {
             return res.status(404).json({ error: 'Link has expired or file not found' });
         }
 
-        // Ensure MongoDB is connected
-        await connectDB();
+        // Ensure MongoDB is connected and get the active client
+        const client = await connectDB();
 
         // Initialize GridFS bucket
-        const db = mongoose.connection.db;
+        const db = client.connection.db;
         const bucket = new mongoose.mongo.GridFSBucket(db, {
             bucketName: 'uploads'
         });

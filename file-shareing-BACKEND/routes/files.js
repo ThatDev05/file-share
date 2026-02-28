@@ -53,11 +53,11 @@ router.post('/', (req, res) => {
         try {
             console.log('Starting manual GridFS manual stream upload for:', req.file.originalname);
             
-            // 0. Ensure MongoDB is connected
-            await connectDB();
+            // 0. Ensure MongoDB is connected and get the active client
+            const client = await connectDB();
 
             // 1. Initialize GridFS Bucket
-            const db = mongoose.connection.db;
+            const db = client.connection.db;
             const bucket = new mongoose.mongo.GridFSBucket(db, {
                 bucketName: 'uploads'
             });
