@@ -7,3 +7,10 @@ const app = require('../server');
 module.exports = (req, res) => {
   return app(req, res);
 };
+
+// Disable Vercel's default body parser to allow multer to process the multipart/form-data stream natively
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
