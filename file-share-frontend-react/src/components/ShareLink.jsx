@@ -4,7 +4,7 @@ import { Copy, Mail } from 'lucide-react';
 
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
   ? 'http://localhost:3000' 
-  : 'https://file-shareing-backend.vercel.app';
+  : 'https://filesharebackend.vercel.app';
 
 export default function ShareLink({ fileUrl, pin, qrCode, uuid, onReset }) {
   const [emailTo, setEmailTo] = useState('');
