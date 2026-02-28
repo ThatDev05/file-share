@@ -8,7 +8,7 @@ function App() {
     <Router>
       <div className="app-container">
         <a href="/">
-          <img src="https://raw.githubusercontent.com/ThatDev05/file-share/main/file-share-frontend-react/public/img/logo.png" alt="Inshare logo" className="logo" />
+          <img src="/img/logo.png" alt="Inshare logo" className="logo" />
         </a>
         <Routes>
           <Route path="/" element={<Home />} />
