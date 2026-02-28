@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const File = require('../model/file');
+const connectDB = require('../config/db');
 const { v4: uuid4 } = require('uuid');
 const mongoose = require('mongoose');
 
@@ -51,6 +52,9 @@ router.post('/', (req, res) => {
         try {
             console.log('Starting manual GridFS manual stream upload for:', req.file.originalname);
             
+            // 0. Ensure MongoDB is connected
+            await connectDB();
+
             // 1. Initialize GridFS Bucket
             const db = mongoose.connection.db;
             const bucket = new mongoose.mongo.GridFSBucket(db, {

@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const File = require('../model/file');
-
+const connectDB = require('../config/db');
 
 const mongoose = require('mongoose');
 
@@ -10,6 +10,9 @@ router.get('/:uuid', async (req, res) => {
         if (!file) {
             return res.status(404).json({ error: 'Link has expired or file not found' });
         }
+
+        // Ensure MongoDB is connected
+        await connectDB();
 
         // Initialize GridFS bucket
         const db = mongoose.connection.db;

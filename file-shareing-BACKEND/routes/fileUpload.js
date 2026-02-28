@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const mongoose = require('mongoose');
+const connectDB = require('../config/db');
 
 const { Readable } = require('stream');
 
@@ -13,6 +14,9 @@ router.post('/fileupload', upload.single('file'), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
+
+        // 0. Ensure MongoDB is connected
+        await connectDB();
 
         // 1. Initialize GridFS Bucket
         const db = mongoose.connection.db;
