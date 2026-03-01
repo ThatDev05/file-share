@@ -195,7 +195,8 @@ router.get('/info/:uuid', async (req, res) => {
             downloadLink: `${process.env.APP_BASE_URL}/download?uuid=${file.uuid}`
         });
     } catch (err) {
-            return res.status(500).json({ error: 'Something went wrong' });
+            console.error('QR code info fetch error:', err);
+            return res.status(500).json({ error: 'Something went wrong', details: err.message });
     }
 });
 
