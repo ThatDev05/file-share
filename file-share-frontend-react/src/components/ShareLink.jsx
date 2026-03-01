@@ -8,7 +8,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
 
 export default function ShareLink({ fileUrl, pin, qrCode, uuid, onReset }) {
   const [emailTo, setEmailTo] = useState('');
-  const [emailFrom, setEmailFrom] = useState('');
+  const [emailFrom, setEmailFrom] = useState('fileshare.too@gmail.com');
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -57,9 +57,10 @@ export default function ShareLink({ fileUrl, pin, qrCode, uuid, onReset }) {
             type="email" 
             placeholder="Your Email" 
             required 
+            readOnly
             value={emailFrom} 
             onChange={(e) => setEmailFrom(e.target.value)}
-            style={{ padding: 10, borderRadius: 5, width: 300 }}
+            style={{ padding: 10, borderRadius: 5, width: 300, background: '#1a1a1a', color: 'white', border: '1px solid #333' }}
           />
           <input 
             type="email" 
@@ -67,9 +68,9 @@ export default function ShareLink({ fileUrl, pin, qrCode, uuid, onReset }) {
             required 
             value={emailTo} 
             onChange={(e) => setEmailTo(e.target.value)}
-            style={{ padding: 10, borderRadius: 5, width: 300 }}
+            style={{ padding: 10, borderRadius: 5, width: 300, background: '#1a1a1a', color: 'white', border: '1px solid var(--light-blue)' }}
           />
-          <button type="submit" disabled={isSending} style={{ padding: '10px 30px', background: 'var(--light-blue)', border: 'none', color: 'white', borderRadius: 5, cursor: isSending ? 'not-allowed' : 'pointer' }}>
+          <button type="submit" disabled={isSending} style={{ padding: '10px 30px', background: 'var(--light-blue)', border: 'none', color: 'black', borderRadius: 5, cursor: isSending ? 'not-allowed' : 'pointer' }}>
             {isSending ? 'Sending...' : 'Send'}
           </button>
         </form>
