@@ -64,7 +64,7 @@ export default function ShareLink({ fileUrl, pin, qrCode, uuid, onReset }) {
           />
           <input 
             type="email" 
-            placeholder="Receiver Email" 
+            placeholder="Your Email" 
             required 
             value={emailTo} 
             onChange={(e) => setEmailTo(e.target.value)}
