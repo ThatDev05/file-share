@@ -60,7 +60,7 @@ export default function ShareLink({ fileUrl, pin, qrCode, uuid, onReset }) {
             readOnly
             value={emailFrom} 
             onChange={(e) => setEmailFrom(e.target.value)}
-            style={{ padding: 10, borderRadius: 5, width: 300, background: '#1a1a1a', color: 'white', border: '1px solid #333' }}
+            style={{ padding: 10, borderRadius: 5, width: 300, background: '#1a1a1a', color: 'gray', border: '1px solid #333', pointerEvents: 'none' }}
           />
           <input 
             type="email" 
