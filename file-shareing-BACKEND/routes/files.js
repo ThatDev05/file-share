@@ -133,6 +133,7 @@ router.post('/send', async (req, res) => {
         return res.status(422).send({ error: 'All fields are required.' });
     }
     try {
+        await connectDB();
         const file = await File.findOne({ uuid: uuid });
         if (!file) return res.status(404).send({ error: 'File not found.' });
 
@@ -169,6 +170,7 @@ router.post('/send', async (req, res) => {
 
 router.get('/pin/:pin', async (req, res) => {
     try {
+        await connectDB();
         const file = await File.findOne({ pin: req.params.pin });
         if (!file) {
             return res.status(404).json({ error: 'Invalid PIN' });
@@ -181,6 +183,7 @@ router.get('/pin/:pin', async (req, res) => {
 
 router.get('/info/:uuid', async (req, res) => {
     try {
+        await connectDB();
         const file = await File.findOne({ uuid: req.params.uuid });
         if (!file) {
             return res.status(404).json({ error: 'Link has expired' });
