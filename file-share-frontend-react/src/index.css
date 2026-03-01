@@ -1,8 +1,8 @@
 :root {
-  --main-bg-color: #1E242B;
-  --light-blue: #03a9f4;
-  --dark-blue: #0288d1;
-  --border-color: #122532;
+  --main-bg-color: #000000;
+  --light-blue: #ffffff;
+  --dark-blue: #dddddd;
+  --border-color: #333333;
   --container-width: 500px;
 }
 
@@ -106,7 +106,7 @@ body {
 }
 
 #browseBtn {
-  color: #007ECB;
+  color: var(--light-blue);
   cursor: pointer;
   text-decoration: underline;
 }
@@ -193,8 +193,8 @@ body {
   padding: 10px 15px;
   font-size: 18px;
   border: 2px dashed var(--border-color);
-  background: #f5fcff;
-  color: #607d8b;
+  background: #1a1a1a;
+  color: white;
   outline: none;
 }
 
@@ -239,7 +239,7 @@ body {
   border-radius: 5px;
   border: none;
   background: var(--light-blue);
-  color: white;
+  color: black;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -285,7 +285,7 @@ section.download {
   background: var(--light-blue);
   border: none;
   border-radius: 5px;
-  color: white;
+  color: black;
   cursor: pointer;
   transition: background 0.3s ease-in-out;
   text-decoration: none;
